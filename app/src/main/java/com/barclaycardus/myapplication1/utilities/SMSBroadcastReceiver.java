@@ -64,18 +64,10 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
 
                     Intent intent1 = new Intent("my-custom-event");
-                    intent1.putExtra("foo", "bar");
+                    intent1.putExtra("otp", verificationCode);
                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
 
                    Intent hhtpIntent = new Intent(context, SMSService.class);
-                    hhtpIntent.putExtra("otp", verificationCode);
-                    hhtpIntent.putExtra("loginOTP", true);
-                    context.startService(hhtpIntent);
-
-//                    ComponentName comp = new ComponentName(context.getPackageName(),
-//                            SMSService.class.getName());
-//                    context.startService(intent);
-//                    startWakefulService(context, (intent.setComponent(comp)));
 
                 }
             }

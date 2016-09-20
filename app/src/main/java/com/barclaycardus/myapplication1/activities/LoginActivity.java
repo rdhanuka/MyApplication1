@@ -39,33 +39,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Servi
     // UI references.
     private AutoCompleteTextView mMobileView;
     private EditText mPasswordView;
-    private SMSService myService;
-    private boolean bound = false;
+    private boolean bound;
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
 
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.e("apple","service connected");
-            // cast the IBinder and get MyService instance
-            SMSService.LocalBinder binder = (SMSService.LocalBinder) service;
-            myService = binder.getService();
-            myService.setCallbacks(LoginActivity.this); // register
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.e("apple","service disconnected");
-            bound = false;
-        }
-    };
     private BroadcastReceiver broadcastReceiver;
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,20 +54,18 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Servi
 
         mPasswordView = (EditText) findViewById(R.id.password);
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        bound = false;
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("creating account, please wait.");
-        progressDialog.show();
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String message = intent.getStringExtra("foo");
-                Log.e("LocalBroadcastManager", "foo : " + message);
+                String message = intent.getStringExtra("otp");
+                Log.e("LocalBroadcastManager", "otp : " + message);
                 responseReceived();
             }
         };
@@ -143,8 +119,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Servi
         }
     }
 
-    private boolean isEmailValid(String email) {
-        return !email.isEmpty();
+    private boolean isEmailValid(String number) {
+        return !number.isEmpty();
     }
 
     private boolean isPasswordValid(String password) {
@@ -165,6 +141,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Servi
     @Override
     protected void onStart() {
         super.onStart();
+        if(!bound){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("creating account, please wait.");
+        progressDialog.show();
+        }
     }
 
 
@@ -177,6 +158,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Servi
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        if (progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
         super.onPause();
     }
 

@@ -1,16 +1,30 @@
 package com.barclaycardus.myapplication1.activities;
 
 import com.barclaycardus.myapplication1.R;
+import com.barclaycardus.myapplication1.utilities.HttpUtils;
+import com.barclaycardus.myapplication1.utilities.SMSService;
+import com.barclaycardus.myapplication1.utilities.ServiceCallbacks;
+
+import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
@@ -18,16 +32,35 @@ import android.widget.Button;
 import android.widget.EditText;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via mobileNumber/password.
  */
-public class LoginActivity extends AccountAuthenticatorActivity {
+public class LoginActivity extends AccountAuthenticatorActivity implements ServiceCallbacks {
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    private AutoCompleteTextView mMobileView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
-    private AccountManager accountManager;
+    private SMSService myService;
+    private boolean bound = false;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.e("apple","service connected");
+            // cast the IBinder and get MyService instance
+            SMSService.LocalBinder binder = (SMSService.LocalBinder) service;
+            myService = binder.getService();
+            myService.setCallbacks(LoginActivity.this); // register
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.e("apple","service disconnected");
+            bound = false;
+        }
+    };
+    private BroadcastReceiver broadcastReceiver;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -39,12 +72,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.mobileNumber);
+        mMobileView = (AutoCompleteTextView) findViewById(R.id.mobileNumber);
 
         mPasswordView = (EditText) findViewById(R.id.password);
-
-        accountManager = AccountManager.get(this);
-
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -52,23 +82,34 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                 attemptLogin();
             }
         });
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("creating account, please wait.");
+        progressDialog.show();
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra("foo");
+                Log.e("LocalBroadcastManager", "foo : " + message);
+                responseReceived();
+            }
+        };
 
     }
 
 
     /**
      * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
+     * If there are form errors (invalid mobileNumber, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
 
         // Reset errors.
-        mEmailView.setError(null);
+        mMobileView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
+        String mobile = mMobileView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -81,14 +122,14 @@ public class LoginActivity extends AccountAuthenticatorActivity {
             cancel = true;
         }
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
+        // Check for a valid mobileNumber.
+        if (TextUtils.isEmpty(mobile)) {
+            mMobileView.setError(getString(R.string.error_field_required));
+            focusView = mMobileView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
+        } else if (!isEmailValid(mobile)) {
+            mMobileView.setError(getString(R.string.error_invalid_number));
+            focusView = mMobileView;
             cancel = true;
         }
 
@@ -97,39 +138,82 @@ public class LoginActivity extends AccountAuthenticatorActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-           AsyncTask mAuthTask = new UserLoginTask(email, password,accountManager);
-            mAuthTask.execute((Void) null);
+          /*  AsyncTask mAuthTask = new UserLoginTask(mobile, password, this, progressDialog);
+            mAuthTask.execute((Void) null);*/
         }
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+        return !email.isEmpty();
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() == 4;
     }
+
+    ProgressDialog progressDialog;
+
+    @Override
+    public void responseReceived() {
+        Log.e("apple", "response recieved called");
+        bound = true;
+        if (progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+
+    @Override
+    protected void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("my-custom-event"));
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        super.onPause();
+    }
+
 
     private class UserLoginTask extends AsyncTask {
         private static final String PARAM_USER_PASS = "password";
-        private final String email;
+        private final String mobileNumber;
         private final String password;
+        private final ProgressDialog progressDialog;
         private AccountManager mAccountManager;
 
-        public UserLoginTask(String email, String password, AccountManager accountManager) {
+        public UserLoginTask(String mobileNumber, String password, Context mContext, ProgressDialog dialog) {
 
-            this.email = email;
+            this.mobileNumber = mobileNumber;
             this.password = password;
-            this.mAccountManager = accountManager;
+            this.mAccountManager = AccountManager.get(mContext);
+            this.progressDialog = dialog;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("creating account, please wait.");
+            progressDialog.show();
         }
 
         @Override
         protected Intent doInBackground(Object[] params) {
+            String createUrl = "https://barclays-cloud-server-1.appspot.com/login?mobileNumber=7042576168";
+            new HttpUtils().makeRequest(createUrl);
+
+            //TODO: wait for receiving OTP
+
+            String loginUrl = "https://barclays-cloud-server-1.appspot.com/login?mobileNumber=7042576168&otp=1111";
+            ResponseEntity<String> json = new HttpUtils().makeRequest(loginUrl);
             String authtoken = UUID.randomUUID().toString(); //TODO: SERVICE CALL TO API
             final Intent res = new Intent();
-            res.putExtra(AccountManager.KEY_ACCOUNT_NAME, email);
+            res.putExtra(AccountManager.KEY_ACCOUNT_NAME, mobileNumber);
             res.putExtra(AccountManager.KEY_ACCOUNT_TYPE, "Barclays");
             res.putExtra(AccountManager.KEY_AUTHTOKEN, authtoken);
             res.putExtra(AccountManager.KEY_AUTH_TOKEN_LABEL, "Barclays Payment Token");
@@ -147,11 +231,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
             String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
             String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
             final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
-                String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
-                String authtokenType = intent.getStringExtra(AccountManager.KEY_AUTH_TOKEN_LABEL);
+            String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
+            String authtokenType = intent.getStringExtra(AccountManager.KEY_AUTH_TOKEN_LABEL);
 
-                mAccountManager.addAccountExplicitly(account, accountPassword, null);
-                mAccountManager.setAuthToken(account, authtokenType, authtoken);
+            mAccountManager.addAccountExplicitly(account, accountPassword, null);
+            mAccountManager.setAuthToken(account, authtokenType, authtoken);
 
             setAccountAuthenticatorResult(intent.getExtras());  //TODO: check this
             setResult(RESULT_OK, intent);

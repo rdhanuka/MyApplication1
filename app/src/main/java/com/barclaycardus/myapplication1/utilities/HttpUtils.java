@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,11 +17,11 @@ import android.util.Log;
 public class HttpUtils {
 
 
-    public ResponseEntity<String> makeRequest(String url, Object... payload) {
+    public ResponseEntity<String> makeRequest(String url, Object payload) {
         RestTemplate restTemplate = new RestTemplate();
 
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-//        restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+        restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
 
         // Add the identity Accept-Encoding header
         HttpHeaders requestHeaders = new HttpHeaders();

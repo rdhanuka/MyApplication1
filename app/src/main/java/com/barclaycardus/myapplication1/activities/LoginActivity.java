@@ -189,12 +189,12 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Servi
         @Override
         protected Intent doInBackground(Object[] params) {
             String createUrl = "https://barclays-cloud-server-1.appspot.com/login?mobileNumber=7042576168";
-            new HttpUtils().makeRequest(createUrl);
+            new HttpUtils().makeRequest(createUrl,null);
 
             //TODO: wait for receiving OTP
 
             String loginUrl = "https://barclays-cloud-server-1.appspot.com/login?mobileNumber=7042576168&otp=1111";
-            ResponseEntity<String> json = new HttpUtils().makeRequest(loginUrl);
+            ResponseEntity<String> json = new HttpUtils().makeRequest(loginUrl,null);
             String authtoken = UUID.randomUUID().toString(); //TODO: SERVICE CALL TO API
             final Intent res = new Intent();
             res.putExtra(AccountManager.KEY_ACCOUNT_NAME, mobileNumber);

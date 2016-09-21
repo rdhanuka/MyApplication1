@@ -15,6 +15,8 @@ import android.util.Log;
  * Created by Ritesh on 9/19/2016.
  */
 public class HttpUtils {
+
+
     public ResponseEntity<String> makeRequest(String url, Object... payload) {
         RestTemplate restTemplate = new RestTemplate();
 

@@ -8,14 +8,20 @@ import java.util.List;
 public class RegisterAccountRequest {
     private String mobileNumber;
     private List<Account> accounts;
+    private List<Address> addresses;
 
     public RegisterAccountRequest() {
     }
 
-    public RegisterAccountRequest(String mobileNumber, List<Account> accounts) {
+
+
+    public RegisterAccountRequest(String mobileNumber, List<Account> accounts,List<Address> addresses) {
         this.mobileNumber = mobileNumber;
         this.accounts = accounts;
+        this.addresses = addresses;
+
     }
+
 
     public String getMobileNumber() {
         return mobileNumber;

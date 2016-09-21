@@ -43,17 +43,11 @@
             android:name=".utilities.SMSService"/>
 
         <activity
-            android:name=".activities.AddressActivity"
-            android:label="@string/title_address" />
-        <activity
             android:name=".activities.ConfirmPaymentActivity"
             android:label="@string/title_activity_main2"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
-        <activity
-            android:name=".activities.AddAccountActivity"
-            android:label="@string/register_account"
-           />
+
         <activity
             android:name=".activities.RegistrationActivity"
             android:label="@string/title_activity_login"

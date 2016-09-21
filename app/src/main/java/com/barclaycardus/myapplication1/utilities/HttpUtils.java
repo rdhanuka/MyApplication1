@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,7 +20,7 @@ public class HttpUtils {
         RestTemplate restTemplate = new RestTemplate();
 
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+//        restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
 
         // Add the identity Accept-Encoding header
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -29,7 +28,7 @@ public class HttpUtils {
         ResponseEntity<String> exchange;
         if (payload != null) {
             HttpEntity<?> requestEntity = new HttpEntity<>(payload, requestHeaders);
-            Log.d("post request :",url);
+            Log.d("post request :", requestEntity.toString());
             exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
         } else {
             Log.d("get request :",url);

@@ -1,21 +1,20 @@
 package com.barclaycardus.myapplication1.activities;
 
+import com.barclaycardus.myapplication1.R;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Switch;
-
-import com.barclaycardus.myapplication1.R;
 
 public class ActivityMain extends AppCompatActivity {
 
@@ -34,6 +33,8 @@ public class ActivityMain extends AppCompatActivity {
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter mPagerAdapter;
+    private PagerTitleStrip mPagerTitleStrip;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,12 @@ public class ActivityMain extends AppCompatActivity {
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+
+        mPagerTitleStrip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
+
         mPager.setAdapter(mPagerAdapter);
+
+
     }
 
     @Override
@@ -101,7 +107,7 @@ public class ActivityMain extends AppCompatActivity {
      * sequence.
      */
 
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+    private class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -115,6 +121,17 @@ public class ActivityMain extends AppCompatActivity {
                     return new AddAccountFragment();
             }
             return new AddressFragment();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Add Address";
+                case 1:
+                    return "Add Payment";
+            }
+            return null;
         }
 
         @Override

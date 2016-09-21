@@ -4,9 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="10dp"
     tools:context=".activities.ActivityMain">
 
     <!-- activity_screen_slide.xml -->
@@ -14,6 +11,18 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/pager_title_strip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@android:color/holo_blue_dark"
+            android:paddingBottom="8dp"
+            android:paddingTop="6dp"
+            android:textColor="#fff"/>
+
+    </android.support.v4.view.ViewPager>
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.barclaycardus.myapplication1;
 
 import com.barclaycardus.myapplication1.activities.LoginActivity;
+import com.barclaycardus.myapplication1.activities.RegistrationActivity;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -30,7 +31,7 @@ public class UdinicAuthenticator extends AbstractAccountAuthenticator{
 
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
-       final Intent intent = new Intent(mContext, LoginActivity.class);
+       final Intent intent = new Intent(mContext, RegistrationActivity.class);
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
         return bundle;

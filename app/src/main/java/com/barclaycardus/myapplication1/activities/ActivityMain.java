@@ -26,7 +26,7 @@ public class ActivityMain extends AppCompatActivity {
         Account[] accounts = am.getAccountsByType("Barclays");
 
       if(accounts.length == 0){
-          Intent  intent = new Intent(this, LoginActivity.class);
+          Intent  intent = new Intent(this, RegistrationActivity.class);
             startActivity(intent);
         }
 

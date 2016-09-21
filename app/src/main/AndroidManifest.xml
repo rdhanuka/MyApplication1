@@ -55,7 +55,7 @@
             android:label="@string/register_account"
            />
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".activities.RegistrationActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme">
 

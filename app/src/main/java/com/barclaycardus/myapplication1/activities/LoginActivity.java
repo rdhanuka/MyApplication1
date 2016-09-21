@@ -114,8 +114,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements Servi
             // form field with an error.
             focusView.requestFocus();
         } else {
-          /*  AsyncTask mAuthTask = new UserLoginTask(mobile, password, this, progressDialog);
-            mAuthTask.execute((Void) null);*/
+           AsyncTask mAuthTask = new UserLoginTask(mobile, password, this, progressDialog);
+            mAuthTask.execute((Void) null);
         }
     }
 

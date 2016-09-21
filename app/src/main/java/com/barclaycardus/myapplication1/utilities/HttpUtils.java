@@ -9,6 +9,8 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import android.util.Log;
+
 /**
  * Created by Ritesh on 9/19/2016.
  */
@@ -23,14 +25,16 @@ public class HttpUtils {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         ResponseEntity<String> exchange;
-        if (payload == null) {
+        if (payload != null) {
             HttpEntity<?> requestEntity = new HttpEntity<>(payload, requestHeaders);
+            Log.d("post request :",url);
             exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
         } else {
+            Log.d("get request :",url);
             HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
             exchange = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         }
-
+        Log.d("response from server",exchange.toString());
         return exchange;
     }
 }

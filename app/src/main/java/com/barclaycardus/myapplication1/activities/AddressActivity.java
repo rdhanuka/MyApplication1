@@ -28,7 +28,7 @@ public class AddressActivity extends AppCompatActivity {
     public void submitAddress(View view) {
         // Do something in response to button
 
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, RegistrationActivity.class);
 
         intent.putExtra(EXTRA_MESSAGE, getAddress());
         startActivity(intent);

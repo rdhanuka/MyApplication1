@@ -18,7 +18,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="number"/>
+        android:inputType="phone"
+        android:maxLength="16"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -39,10 +40,10 @@
 
     <EditText
         android:id="@+id/edExpiryDate"
+        android:ems="10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="date"/>
+        android:inputType="phone"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -54,12 +55,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="number"/>
+        android:inputType="phone"
+        android:maxLength="3"/>
 
     <Button
         android:id="@+id/registerAccount"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Submit"/>
+        android:layout_marginTop="25dp"
+        android:background="@color/colorPrimaryDark"
+        android:text="SUBMIT"
+        android:textColor="@android:color/white"
+        android:textSize="16dp"/>
 </LinearLayout>

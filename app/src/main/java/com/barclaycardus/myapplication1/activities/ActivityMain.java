@@ -1,6 +1,7 @@
 package com.barclaycardus.myapplication1.activities;
 
 import com.barclaycardus.myapplication1.R;
+import com.barclaycardus.myapplication1.domains.RegisterAccountRequest;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -36,6 +37,8 @@ public class ActivityMain extends AppCompatActivity {
     private PagerTitleStrip mPagerTitleStrip;
 
 
+    private static RegisterAccountRequest registerAccountRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +53,12 @@ public class ActivityMain extends AppCompatActivity {
         mPagerTitleStrip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
 
         mPager.setAdapter(mPagerAdapter);
+        registerAccountRequest = new RegisterAccountRequest();
 
+    }
 
+    public RegisterAccountRequest getRegisterationRequest() {
+        return registerAccountRequest;
     }
 
     @Override
@@ -75,6 +82,7 @@ public class ActivityMain extends AppCompatActivity {
           Intent  intent = new Intent(this, RegistrationActivity.class);
             startActivity(intent);
         }
+        registerAccountRequest.setMobileNumber(accounts[0].name);
         super.onStart();
     }
 
@@ -116,9 +124,9 @@ public class ActivityMain extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    return new AddressFragment();
-                case 1:
                     return new AddAccountFragment();
+                case 1:
+                    return new AddressFragment();
             }
             return new AddressFragment();
         }
@@ -127,9 +135,9 @@ public class ActivityMain extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Add Address";
-                case 1:
                     return "Add Payment";
+                case 1:
+                    return "Add Address";
             }
             return null;
         }

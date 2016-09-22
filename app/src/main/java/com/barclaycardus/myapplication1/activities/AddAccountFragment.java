@@ -1,15 +1,13 @@
 package com.barclaycardus.myapplication1.activities;
 
-import static android.widget.Toast.LENGTH_SHORT;
-
 import com.barclaycardus.myapplication1.R;
 import com.barclaycardus.myapplication1.domains.Account;
+import com.barclaycardus.myapplication1.domains.AsyncTaskResult;
 import com.barclaycardus.myapplication1.domains.RegisterAccountRequest;
 import com.barclaycardus.myapplication1.utilities.HttpUtils;
 
 import java.util.Collections;
 
-import android.accounts.AccountManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -22,8 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import static java.util.Collections.singletonList;
 
 /**
  * Created by Ritesh on 9/13/2016.
@@ -47,8 +43,9 @@ public class AddAccountFragment extends Fragment {
         btRegisterAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                android.accounts.Account mobile = AccountManager.get(getContext()).getAccountsByType("Barclays")[0];
-                new HttpRequestTask(new RegisterAccountRequest(mobile.name, singletonList(getAccount()),null), getActivity()).execute((Void) null);
+                RegisterAccountRequest request = getRegistrationRequest();
+                new HttpRequestTask(new RegisterAccountRequest(request.getMobileNumber(),
+                        Collections.singletonList(getAccount()), request.getAddressList()), getActivity()).execute((Void) null);
             }
         });
 
@@ -75,8 +72,16 @@ public class AddAccountFragment extends Fragment {
         );
     }
 
+    private void performFinishAction(RegisterAccountRequest request) {
 
-    private class HttpRequestTask extends AsyncTask<Void, Void, Account> {
+        getRegistrationRequest().setAccounts(request.getAccounts());
+    }
+
+    private RegisterAccountRequest getRegistrationRequest() {
+        return ((ActivityMain) getActivity()).getRegisterationRequest();
+    }
+
+    class HttpRequestTask extends AsyncTask<Void, Void, AsyncTaskResult> {
 
         private final ProgressDialog progressDialog;
         RegisterAccountRequest registerAccountRequest;
@@ -93,25 +98,31 @@ public class AddAccountFragment extends Fragment {
         }
 
         @Override
-        protected Account doInBackground(Void... params) {
+        protected AsyncTaskResult doInBackground(Void... params) {
             try {
                 final String url = "https://barclays-cloud-server-1.appspot.com/save";
 
                 new HttpUtils().makeRequest(url, registerAccountRequest);
 
-                return registerAccountRequest.getAccounts().get(0);
+                return new AsyncTaskResult(registerAccountRequest);
             } catch (Exception e) {
                 Log.e("AddAccountFragment", e.getMessage(), e);
+                return new AsyncTaskResult(e);
             }
-            return null;
         }
 
         @Override
-        protected void onPostExecute(Account account) {
+        protected void onPostExecute(AsyncTaskResult account) {
             if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
-        }
+            if (account.getError() != null) {
+                Toast.makeText(getActivity(), "something went wrong.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            performFinishAction(registerAccountRequest);
+            }
+
 
     }
 

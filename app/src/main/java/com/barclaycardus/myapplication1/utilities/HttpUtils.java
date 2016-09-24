@@ -29,14 +29,14 @@ public class HttpUtils {
         ResponseEntity<String> exchange;
         if (payload != null) {
             HttpEntity<?> requestEntity = new HttpEntity<>(payload, requestHeaders);
-            Log.d("post request :", requestEntity.toString());
+            Log.e("post request :",url + requestEntity.getBody().toString());
             exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
         } else {
-            Log.d("get request :",url);
+            Log.e("get request :",url);
             HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
             exchange = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         }
-        Log.d("response from server",exchange.toString());
+        Log.e("response from server",exchange.toString());
         return exchange;
     }
 }

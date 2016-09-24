@@ -17,7 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ActivityMain extends AppCompatActivity {
+public class ActivityMain extends AppCompatActivity implements AddAccountFragment.OnArticleSelectedListener {
 
     /**
      * The number of pages (wizard steps) to show in this demo application.
@@ -51,7 +51,6 @@ public class ActivityMain extends AppCompatActivity {
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         mPagerTitleStrip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
-
         mPager.setAdapter(mPagerAdapter);
         registerAccountRequest = new RegisterAccountRequest();
 
@@ -81,8 +80,7 @@ public class ActivityMain extends AppCompatActivity {
       if(accounts.length == 0){
           Intent  intent = new Intent(this, RegistrationActivity.class);
             startActivity(intent);
-        }
-        registerAccountRequest.setMobileNumber(accounts[0].name);
+      }
         super.onStart();
     }
 
@@ -110,6 +108,12 @@ public class ActivityMain extends AppCompatActivity {
     }
         return(super.onOptionsItemSelected(item));
     }
+
+    @Override
+    public void onArticleSelected() {
+        mPager.setCurrentItem(1, true);
+    }
+
     /**
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
      * sequence.

@@ -8,6 +8,7 @@ import com.barclaycardus.myapplication1.utilities.HttpUtils;
 
 import java.util.Collections;
 
+import android.accounts.AccountManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -28,6 +29,25 @@ public class AddAccountFragment extends Fragment {
 
     EditText edAccount, edName, edCvv, edExpiryDate;
     private Button btRegisterAccount;
+
+    OnArticleSelectedListener mListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (OnArticleSelectedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement OnArticleSelectedListener");
+        }
+    }
+
+    private void performFinishAction(RegisterAccountRequest request) {
+        getRegistrationRequest().setMobileNumber(request.getMobileNumber());
+        getRegistrationRequest().setAccounts(request.getAccounts());
+        mListener.onArticleSelected();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,9 +92,8 @@ public class AddAccountFragment extends Fragment {
         );
     }
 
-    private void performFinishAction(RegisterAccountRequest request) {
-
-        getRegistrationRequest().setAccounts(request.getAccounts());
+    public interface OnArticleSelectedListener {
+        void onArticleSelected();
     }
 
     private RegisterAccountRequest getRegistrationRequest() {
@@ -85,9 +104,11 @@ public class AddAccountFragment extends Fragment {
 
         private final ProgressDialog progressDialog;
         RegisterAccountRequest registerAccountRequest;
+        private Context mContext;
 
         public HttpRequestTask(RegisterAccountRequest registerAccountRequest, Context mContext) {
             this.registerAccountRequest = registerAccountRequest;
+            this.mContext = mContext;
             progressDialog = new ProgressDialog(mContext);
         }
 
@@ -101,6 +122,7 @@ public class AddAccountFragment extends Fragment {
         protected AsyncTaskResult doInBackground(Void... params) {
             try {
                 final String url = "https://barclays-cloud-server-1.appspot.com/save";
+                registerAccountRequest.setMobileNumber(AccountManager.get(mContext).getAccountsByType("Barclays")[0].name);
 
                 new HttpUtils().makeRequest(url, registerAccountRequest);
 

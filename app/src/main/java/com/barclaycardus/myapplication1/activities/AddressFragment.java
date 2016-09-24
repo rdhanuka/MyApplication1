@@ -8,6 +8,7 @@ import com.barclaycardus.myapplication1.utilities.HttpUtils;
 
 import java.util.Collections;
 
+import android.accounts.AccountManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -62,6 +63,7 @@ public class AddressFragment extends Fragment {
 
     private void performFinishAction(RegisterAccountRequest request) {
 
+        getRegistrationRequest().setMobileNumber(request.getMobileNumber());
         getRegistrationRequest().setAddressList(request.getAddressList());
     }
 
@@ -73,9 +75,11 @@ public class AddressFragment extends Fragment {
 
         private final ProgressDialog progressDialog;
         RegisterAccountRequest registerAccountRequest;
+        private Context mContext;
 
         public HttpRequestTask(RegisterAccountRequest registerAccountRequest, Context mContext) {
             this.registerAccountRequest = registerAccountRequest;
+            this.mContext = mContext;
             progressDialog = new ProgressDialog(mContext);
         }
 
@@ -89,6 +93,7 @@ public class AddressFragment extends Fragment {
         protected AsyncTaskResult doInBackground(Void... params) {
             try {
                 final String url = "https://barclays-cloud-server-1.appspot.com/save";
+                registerAccountRequest.setMobileNumber(AccountManager.get(mContext).getAccountsByType("Barclays")[0].name);
 
                 new HttpUtils().makeRequest(url, registerAccountRequest);
 
